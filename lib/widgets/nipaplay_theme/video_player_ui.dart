@@ -17,6 +17,7 @@ import 'blur_dialog.dart';
 import 'right_edge_hover_menu.dart';
 import 'minimal_progress_bar.dart';
 import 'danmaku_density_bar.dart';
+import 'speed_boost_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as p;
 
@@ -219,7 +220,11 @@ class _VideoPlayerUIState extends State<VideoPlayerUI> {
     _doubleTapTimer?.cancel();
 
     final videoState = Provider.of<VideoPlayerState>(context, listen: false);
-    if (videoState.hasVideo) {
+    if (!videoState.hasVideo) return;
+
+    if (globals.isDesktop) {
+      unawaited(videoState.toggleFullscreen());
+    } else {
       videoState.togglePlayPause();
     }
   }
@@ -443,6 +448,11 @@ class _VideoPlayerUIState extends State<VideoPlayerUI> {
                             
                             if (videoState.hasVideo)
                               VerticalIndicator(videoState: videoState),
+
+                            if (videoState.hasVideo)
+                              const Positioned.fill(
+                                child: SpeedBoostIndicator(),
+                              ),
                             
                             if (globals.isPhone && videoState.hasVideo)
                               const BrightnessGestureArea(),
@@ -532,6 +542,11 @@ class _VideoPlayerUIState extends State<VideoPlayerUI> {
                               if (videoState.hasVideo)
                                 VerticalIndicator(videoState: videoState),
                               
+                              if (videoState.hasVideo)
+                                const Positioned.fill(
+                                  child: SpeedBoostIndicator(),
+                                ),
+
                               // 右边缘悬浮菜单（仅桌面版）
                               uiThemeProvider.isFluentUITheme
                                   ? const FluentRightEdgeMenu()
